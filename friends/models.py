@@ -168,6 +168,26 @@ class JoinInvitation(models.Model):
 
 class FriendshipInvitationManager(models.Manager):
     
+    def send_invitation(self, from_user, to_user, message=''):
+        """
+        Safely send an invitation preventing problems such as inviting oneself 
+        or inviting a user who has already invited you.
+        """
+        if Friendship.objects.are_friends(from_user, to_user):
+            return
+        qs = self.invitations(to_user=from_user, from_user=to_user, status="1")
+        if qs.count(): # is the other user trying to be friends already?
+            fi.accept()
+            return
+        if from_user == to_user:
+            return
+        FriendshipInvitation.objects.create(
+            from_user = from_user,
+            to_user = to_user,
+            message = message,
+            status = '1',
+        )
+    
     def invitations(self, *args, **kwargs):
         return self.filter(*args, **kwargs).exclude(status__in=["6", "8"])
 
