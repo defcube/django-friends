@@ -177,7 +177,7 @@ class FriendshipInvitationManager(models.Manager):
             return
         qs = self.invitations(to_user=from_user, from_user=to_user, status="1")
         if qs.count(): # is the other user trying to be friends already?
-            fi.accept()
+            qs[0].accept()
             return
         if from_user == to_user:
             return
