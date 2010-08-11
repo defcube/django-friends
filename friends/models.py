@@ -61,6 +61,11 @@ class FriendshipManager(models.Manager):
             friends.append({"friend": friendship.from_user, "friendship": friendship})
         return friends
     
+    def friendships_for_user(self, user):
+        qs = Friendship.objects.filter(from_user=user)\
+             | Friendship.objects.filter(to_user=user)
+        return qs.select_related(depth=1)
+    
     def are_friends(self, user1, user2):
         if user1.is_anonymous() or user2.is_anonymous():
             return False
