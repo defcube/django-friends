@@ -198,7 +198,7 @@ class FriendshipInvitationManager(models.Manager):
         )
     
     def invitations(self, *args, **kwargs):
-        return self.filter(*args, **kwargs).exclude(status__in=["6", "8"])
+        return self.filter(*args, **kwargs).exclude(status__in=["5", "6", "8"])
 
 
 class FriendshipInvitation(models.Model):
