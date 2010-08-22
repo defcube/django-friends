@@ -1,11 +1,10 @@
 import datetime
-
 from random import random
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models import signals
+from django.db.models import signals, Q
 from django.template.loader import render_to_string
 from django.utils.hashcompat import sha_constructor
 
@@ -69,11 +68,9 @@ class FriendshipManager(models.Manager):
     def are_friends(self, user1, user2):
         if user1.is_anonymous() or user2.is_anonymous():
             return False
-        if self.filter(from_user__id=user1.pk, to_user__id=user2.pk).count() > 0:
-            return True
-        if self.filter(from_user__id=user2.pk, to_user__id=user1.pk).count() > 0:
-            return True
-        return False
+        q1 = Q(from_user=user1, to_user=user2)
+        q2 = Q(from_user=user2, to_user=user1)
+        return self.filter(q1 | q2).exists()
     
     def remove(self, user1, user2):
         if self.filter(from_user=user1, to_user=user2):
