@@ -222,7 +222,15 @@ class FriendshipInvitation(models.Model):
         if not Friendship.objects.are_friends(self.to_user, self.from_user):
             self.status = "6"
             self.save()
-
+            
+            
+    def save(self, *args, **kwargs):
+        created = not self.pk
+        super(FriendshipInvitation, self).save(*args, **kwargs)
+        if created:
+            import notification.models as notification
+            notification.send([self.to_user], "friends_invite", 
+                              {"invitation": self})
 
 class FriendshipInvitationHistory(models.Model):
     """
