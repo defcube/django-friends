@@ -213,10 +213,11 @@ class FriendshipInvitation(models.Model):
         if not Friendship.objects.are_friends(self.to_user, self.from_user):
             friendship = Friendship(to_user=self.to_user, from_user=self.from_user)
             friendship.save()
-            self.status = "5"
-            self.save()
             if notification:
                 notification.send([self.from_user], "friends_accept", {"invitation": self})
+        self.status = "5"
+        self.save()
+            
     
     def decline(self):
         if not Friendship.objects.are_friends(self.to_user, self.from_user):
@@ -231,7 +232,7 @@ class FriendshipInvitation(models.Model):
             import notification.models as notification
             notification.send([self.to_user], "friends_invite", 
                               {"invitation": self})
-
+    
 class FriendshipInvitationHistory(models.Model):
     """
     History for friendship invitations
