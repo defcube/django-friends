@@ -220,9 +220,8 @@ class FriendshipInvitation(models.Model):
             
     
     def decline(self):
-        if not Friendship.objects.are_friends(self.to_user, self.from_user):
-            self.status = "6"
-            self.save()
+        self.status = "6"
+        self.save()
             
             
     def save(self, *args, **kwargs):
