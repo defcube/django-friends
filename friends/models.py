@@ -231,7 +231,11 @@ class FriendshipInvitation(models.Model):
             import notification.models as notification
             notification.send([self.to_user], "friends_invite", 
                               {"invitation": self})
-
+            n = notification.Notice.objects.filter(
+                user=self.to_user).order_by('-pk')[0]
+            n.unseen = False
+            n.save()
+    
 class FriendshipInvitationHistory(models.Model):
     """
     History for friendship invitations
