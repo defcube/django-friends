@@ -239,20 +239,27 @@ class FriendshipInvitation(models.Model):
         super(FriendshipInvitation, self).save(*args, **kwargs)
         if created:
             import notification.models as notification
-            notification.send([self.to_user], "friends_invite", 
-                              {"invitation": self})
-            n = notification.Notice.objects.filter(
-                user=self.to_user).order_by('-pk')[0]
-            n.unseen = False
-            n.save()
+            
+            if FriendshipInvitationHistory.objects.filter(
+                from_user=self.from_user,
+                to_user=self.to_user,
+                sent=datetime.date.today()).count() == 0:
+                notification.send([self.to_user], "friends_invite", 
+                                  {"invitation": self})
+                n = notification.Notice.objects.filter(
+                    user=self.to_user).order_by('-pk')[0]
+                n.unseen = False
+                n.save()
     
 class FriendshipInvitationHistory(models.Model):
     """
     History for friendship invitations
     """
     
-    from_user = models.ForeignKey(User, related_name="invitations_from_history")
-    to_user = models.ForeignKey(User, related_name="invitations_to_history")
+    from_user = models.ForeignKey(User, related_name="invitations_from_history",
+                                  null=True)
+    to_user = models.ForeignKey(User, related_name="invitations_to_history",
+                                null=True)
     message = models.TextField()
     sent = models.DateField(default=datetime.date.today)
     status = models.CharField(max_length=1, choices=INVITE_STATUS)
