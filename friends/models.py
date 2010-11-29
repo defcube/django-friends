@@ -219,10 +219,11 @@ class FriendshipInvitation(models.Model):
     
     def accept(self):
         if not Friendship.objects.are_friends(self.to_user, self.from_user):
-            friendship = Friendship(to_user=self.to_user, 
-                                    from_user=self.from_user)
+            friendship, created = Friendship.objects.get_or_create(
+                to_user=self.to_user, 
+                from_user=self.from_user)
             friendship.save()
-            if notification:
+            if created and notification:
                 notification.send([self.from_user], "friends_accept", 
                                   {"invitation": self})
         self.status = "5"
