@@ -247,10 +247,10 @@ class FriendshipInvitation(models.Model):
                 sent=datetime.date.today()).count() == 0:
                 notification.send([self.to_user], "friends_invite", 
                                   {"invitation": self})
-                n = notification.Notice.objects.filter(
-                    user=self.to_user).order_by('-pk')[0]
-                n.unseen = False
-                n.save()
+                #n = notification.Notice.objects.filter(
+                #    user=self.to_user).order_by('-pk')[0]
+                #n.unseen = False
+                #n.save()
     
 class FriendshipInvitationHistory(models.Model):
     """
