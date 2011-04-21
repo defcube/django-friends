@@ -1,4 +1,5 @@
 from django.template import Library, TemplateSyntaxError, Node
+from django.core.cache import cache
 import friends.models
 
 register = Library()
@@ -19,7 +20,12 @@ class FriendsPendingInviteCountNode(Node):
         
     def render(self, context):    
         user = context['request'].user
-        c = friends.models.FriendshipInvitation.objects.\
-          invitations(to_user=user).count()
+        cache_key = '{0}_{1}'.format(user.username, 'invitations_count_cache')
+        c = cache.get(cache_key)
+        if not c:
+            c = friends.models.FriendshipInvitation.objects.\
+                invitations(to_user=user).count()
+            c = str(c)
+            cache.set(cache_key, c, 600)
         context[self.varname] = c
         return ''
