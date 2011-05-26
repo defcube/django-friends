@@ -284,13 +284,10 @@ if EmailAddress:
     signals.post_save.connect(new_user, sender=EmailAddress)
 
 def delete_friendship(sender, instance, **kwargs):
-    friendship_invitations = FriendshipInvitation.objects.filter(
-        to_user=instance.to_user, from_user=instance.from_user)
-    for friendship_invitation in friendship_invitations:
-        if friendship_invitation.status != "8":
-            friendship_invitation.status = "8"
-            friendship_invitation.save()
-
+    FriendshipInvitation.objects.filter(
+        to_user=instance.to_user,
+        from_user=instance.from_user).exclude(status="8").update(status="8")
+    
 
 signals.pre_delete.connect(delete_friendship, sender=Friendship)
 
