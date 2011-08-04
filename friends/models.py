@@ -216,7 +216,8 @@ class FriendshipInvitation(models.Model):
     status = models.CharField(max_length=1, choices=INVITE_STATUS)
     
     objects = FriendshipInvitationManager()
-    
+    raw_objects = models.Manager()
+
     def accept(self):
         if not Friendship.objects.are_friends(self.to_user, self.from_user):
             friendship, created = Friendship.objects.get_or_create(
