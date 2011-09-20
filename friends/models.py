@@ -223,7 +223,10 @@ class FriendshipInvitation(models.Model):
 
     def accept(self):
         self.status = "5"
-        self.save()
+        try:
+            self.save()
+        except IntegrityError:
+            return
         if not Friendship.objects.are_friends(self.to_user, self.from_user):
             friendship, created = Friendship.objects.get_or_create(
                 to_user=self.to_user, 
