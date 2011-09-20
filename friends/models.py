@@ -3,7 +3,7 @@ from random import random
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.db import models
+from django.db import models, IntegrityError
 from django.db.models import signals, Q
 from django.template.loader import render_to_string
 from django.utils.hashcompat import sha_constructor
@@ -166,11 +166,14 @@ class JoinInvitation(models.Model):
     
     def accept(self, new_user):
         # mark invitation accepted
-        self.status = "5"
-        self.save()
-        # auto-create friendship
-        friendship = Friendship(to_user=new_user, from_user=self.from_user)
-        friendship.save()
+        try:
+            self.status = "5"
+            self.save()
+            # auto-create friendship
+            friendship = Friendship(to_user=new_user, from_user=self.from_user)
+            friendship.save()
+        except IntegrityError:
+            return
         # notify
         if notification:
             notification.send([self.from_user], "join_accept", 
